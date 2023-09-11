@@ -6,19 +6,12 @@
     "scripts": {
         "start": "nodemon index.js"
     },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/FilippoBellei/todo-express.git"
-    },
     "keywords": [],
     "author": "",
     "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/FilippoBellei/todo-express/issues"
-    },
-    "homepage": "https://github.com/FilippoBellei/todo-express#readme",
     "dependencies": {
-        "express": "^4.18.2"
+        "express": "^4.18.2",
+        "sqlite3": "^5.1.6"
     },
     "devDependencies": {
         "nodemon": "^3.0.1"
