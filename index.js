@@ -1,5 +1,5 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('sqlite3');
 
 const app = express();
 const db = new sqlite3.Database('db.sqlite');
@@ -13,70 +13,72 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 
-app.get('/todo', (req, res) => {
-    db.all('SELECT * FROM task;', (error, rows) => {
-        if (error) {
-            res.json({ error: error });
+app.get('/todo', (req, res, next) => {
+    db.all('SELECT * FROM taski;', (err, rows) => {
+        if (err) {
+            next(err);
             return;
         }
-        data = null;
-        if (rows) data = rows;
-        res.json({ response: data });
+        if (rows.length !== 0) {
+            const data = rows;
+            res.json({ result: data });
+            return;
+        }
+        res.status(404).json({ result: false });
     });
 });
 
-app.get('/todo/:id', (req, res) => {
+app.get('/todo/:id', (req, res, next) => {
     const { id } = req.params;
-    db.get(`SELECT * FROM task WHERE id = ?;`, [id], (error, row) => {
-        if (error) {
-            res.json({ error: error });
+    sql = `SELECT * FROM task WHERE id = ?;`;
+    db.get(sql, id, (err, row) => {
+        if (err) {
+            next(err);
             return;
         }
-        data = null;
-        if (row) data = row;
-        res.json({ response: data });
+        if (row) {
+            const data = row;
+            res.json({ result: data });
+            return;
+        }
+        res.status(404).json({ result: false });
     });
 });
 
-app.post('/todo', (req, res) => {
+app.post('/todo', (req, res, next) => {
     const { name, description } = req.body;
-    db.run(
-        'INSERT INTO task (name, description) VALUES(?, ?);',
-        [name, description],
-        (error) => {
-            if (error) {
-                res.json({ error: error });
-                return;
-            }
-            res.json({ success: true });
-        }
-    );
-});
-
-app.put('/todo/:id', (req, res) => {
-    const { id } = req.params;
-    const { name, description } = req.body;
-    db.run(
-        'UPDATE task SET name = ?, description = ? WHERE id = ?',
-        [name, description, id],
-        (error) => {
-            if (error) {
-                res.json({ error: error });
-                return;
-            }
-            res.json({ success: true });
-        }
-    );
-});
-
-app.delete('/todo/:id', (req, res) => {
-    const { id } = req.params;
-    db.run('DELETE FROM task WHERE id = ?', [id], (error) => {
-        if (error) {
-            res.json({ error: error });
+    const sql = 'INSERT INTO task (name, description) VALUES(?, ?);';
+    db.run(sql, [name, description], (err) => {
+        if (err) {
+            next(err);
             return;
         }
-        res.json({ success: true });
+        res.json({ result: true });
+    });
+});
+
+app.put('/todo/:id', (req, res, next) => {
+    const { id } = req.params;
+    const { name, description } = req.body;
+    const sql = 'UPDATE task SET name = ?, description = ? WHERE id = ?';
+    db.run(sql, [name, description, id], (err) => {
+        if (err) {
+            next(err);
+            return;
+        }
+        res.json({ result: true });
+    });
+});
+
+app.delete('/todo/:id', (req, res, next) => {
+    const { id } = req.params;
+    sql = 'DELETE FROM task WHERE id = ?';
+    db.run(sql, [id], (err) => {
+        if (err) {
+            next(err);
+            return;
+        }
+        res.json({ result: true });
     });
 });
 
