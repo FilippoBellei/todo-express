@@ -5,6 +5,12 @@ const app = express();
 const db = new sqlite3.Database('db.sqlite');
 const port = 3000;
 
+app.use((req, res, next) => {
+    const { ip, method, url } = req;
+    const date = Date(Date.now());
+    console.log(date, ip, method, url);
+    next();
+});
 app.use(express.json());
 
 app.get('/todo', (req, res) => {
