@@ -6,8 +6,8 @@ const sql =
 
 db.run(sql, (error) => {
     if (error) {
-        console.log('Error during database initialization:');
-        console.log(error);
+        console.error('Error during database initialization:');
+        console.error(error);
         return;
     }
     console.log('Database initialized');
