@@ -10,7 +10,7 @@ app.use(morgan(':date :remote-addr ":method :url" :status'));
 app.use(express.json());
 
 app.get('/todo', (req, res, next) => {
-    db.all('SELECT * FROM taski;', (err, rows) => {
+    db.all('SELECT * FROM task;', (err, rows) => {
         if (err) {
             next(err);
             return;
@@ -76,6 +76,11 @@ app.delete('/todo/:id', (req, res, next) => {
         }
         res.json({ result: true });
     });
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.message);
+    res.status(500).json({ result: false });
 });
 
 app.listen(port, () => {
