@@ -6,9 +6,12 @@ const app = express();
 const db = new sqlite3.Database('db.sqlite');
 const port = 3000;
 
+// Logger and json parser middleware
 app.use(morgan(':date :remote-addr ":method :url" :status'));
 app.use(express.json());
 
+// GET /todo
+// It returns all the tasks
 app.get('/todo', (req, res, next) => {
     const sql = 'SELECT * FROM task;';
     db.all(sql, (err, rows) => {
@@ -25,6 +28,8 @@ app.get('/todo', (req, res, next) => {
     });
 });
 
+// GET /todo/id
+// It returns a task
 app.get('/todo/:id', (req, res, next) => {
     const { id } = req.params;
     const sql = `SELECT * FROM task WHERE id = ?;`;
@@ -42,6 +47,12 @@ app.get('/todo/:id', (req, res, next) => {
     });
 });
 
+// POST /todo
+// It creates a task
+// {
+//     name:  "name",
+//     description: "description"
+// }
 app.post('/todo', (req, res, next) => {
     const { name, description } = req.body;
     if (name && description) {
@@ -58,6 +69,12 @@ app.post('/todo', (req, res, next) => {
     res.status(400).json({ result: false });
 });
 
+// PUT /todo/id
+// It updates a task
+// {
+//     name:  "name",
+//     description: "description"
+// }
 app.put('/todo/:id', (req, res, next) => {
     const { id } = req.params;
     const { name, description } = req.body;
@@ -86,6 +103,8 @@ app.put('/todo/:id', (req, res, next) => {
     res.status(400).json({ result: false });
 });
 
+// DELETE /todo/id
+// It deletes a task
 app.delete('/todo/:id', (req, res, next) => {
     const { id } = req.params;
     let sql = `SELECT * FROM task WHERE id = ?;`;
@@ -109,6 +128,7 @@ app.delete('/todo/:id', (req, res, next) => {
     });
 });
 
+// 404 and 500 errors handler
 app.use((req, res, next) => res.status(404).json({ result: false }));
 app.use((err, req, res, next) => {
     console.error(err.message);
