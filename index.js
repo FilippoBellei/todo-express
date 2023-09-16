@@ -1,5 +1,5 @@
 const express = require('express');
-const morgan = require('morgan');
+const logger = require('morgan');
 const sqlite3 = require('sqlite3');
 
 const app = express();
@@ -7,7 +7,7 @@ const db = new sqlite3.Database('db.sqlite');
 const port = 3000;
 
 // Logger and json parser middleware
-app.use(morgan(':date :remote-addr ":method :url" :status'));
+app.use(logger(':date :remote-addr ":method :url" :status'));
 app.use(express.json());
 
 // GET /todo
@@ -24,7 +24,8 @@ app.get('/todo', (req, res, next) => {
             res.json({ result: data });
             return;
         }
-        res.status(404).json({ result: false });
+        res.status(404);
+        res.json({ result: false });
     });
 });
 
@@ -43,7 +44,8 @@ app.get('/todo/:id', (req, res, next) => {
             res.json({ result: data });
             return;
         }
-        res.status(404).json({ result: false });
+        res.status(404);
+        res.json({ result: false });
     });
 });
 
@@ -66,7 +68,8 @@ app.post('/todo', (req, res, next) => {
         });
         return;
     }
-    res.status(400).json({ result: false });
+    res.status(400);
+    res.json({ result: false });
 });
 
 // PUT /todo/id
@@ -96,11 +99,13 @@ app.put('/todo/:id', (req, res, next) => {
                 });
                 return;
             }
-            res.status(404).json({ result: false });
+            res.status(404);
+            res.json({ result: false });
         });
         return;
     }
-    res.status(400).json({ result: false });
+    res.status(400);
+    res.json({ result: false });
 });
 
 // DELETE /todo/id
@@ -124,15 +129,20 @@ app.delete('/todo/:id', (req, res, next) => {
             });
             return;
         }
-        res.status(404).json({ result: false });
+        res.status(404);
+        res.json({ result: false });
     });
 });
 
-// 404 and 500 errors handler
-app.use((req, res, next) => res.status(404).json({ result: false }));
+// 500 and 404 errors handler
 app.use((err, req, res, next) => {
     console.error(err.message);
-    res.status(500).json({ result: false });
+    res.status(500);
+    res.json({ result: false });
+});
+app.use((req, res) => {
+    res.status(404);
+    res.json({ result: false });
 });
 
 app.listen(port, () => {
