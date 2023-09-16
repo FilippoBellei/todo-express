@@ -1,3 +1,4 @@
+const compression = require('compression');
 const express = require('express');
 const logger = require('morgan');
 const sqlite3 = require('sqlite3');
@@ -7,6 +8,7 @@ const db = new sqlite3.Database('db.sqlite');
 const port = 3000;
 
 // Logger and json parser middleware
+app.use(compression());
 app.use(logger(':date :remote-addr ":method :url" :status'));
 app.use(express.json());
 
