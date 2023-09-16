@@ -10,7 +10,8 @@ app.use(morgan(':date :remote-addr ":method :url" :status'));
 app.use(express.json());
 
 app.get('/todo', (req, res, next) => {
-    db.all('SELECT * FROM task;', (err, rows) => {
+    const sql = 'SELECT * FROM task;';
+    db.all(sql, (err, rows) => {
         if (err) {
             next(err);
             return;
@@ -26,7 +27,7 @@ app.get('/todo', (req, res, next) => {
 
 app.get('/todo/:id', (req, res, next) => {
     const { id } = req.params;
-    sql = `SELECT * FROM task WHERE id = ?;`;
+    const sql = `SELECT * FROM task WHERE id = ?;`;
     db.get(sql, id, (err, row) => {
         if (err) {
             next(err);
