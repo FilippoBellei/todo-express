@@ -78,6 +78,7 @@ app.delete('/todo/:id', (req, res, next) => {
     });
 });
 
+app.use((req, res, next) => res.status(404).json({ result: false }));
 app.use((err, req, res, next) => {
     console.error(err.message);
     res.status(500).json({ result: false });
