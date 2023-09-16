@@ -44,38 +44,68 @@ app.get('/todo/:id', (req, res, next) => {
 
 app.post('/todo', (req, res, next) => {
     const { name, description } = req.body;
-    const sql = 'INSERT INTO task (name, description) VALUES(?, ?);';
-    db.run(sql, [name, description], (err) => {
-        if (err) {
-            next(err);
-            return;
-        }
-        res.json({ result: true });
-    });
+    if (name && description) {
+        const sql = 'INSERT INTO task (name, description) VALUES(?, ?);';
+        db.run(sql, [name, description], (err) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            res.json({ result: true });
+        });
+        return;
+    }
+    res.status(400).json({ result: false });
 });
 
 app.put('/todo/:id', (req, res, next) => {
     const { id } = req.params;
     const { name, description } = req.body;
-    const sql = 'UPDATE task SET name = ?, description = ? WHERE id = ?';
-    db.run(sql, [name, description, id], (err) => {
-        if (err) {
-            next(err);
-            return;
-        }
-        res.json({ result: true });
-    });
+    if (name && description) {
+        let sql = `SELECT * FROM task WHERE id = ?;`;
+        db.get(sql, id, (err, row) => {
+            if (err) {
+                next(err);
+                return;
+            }
+            if (row) {
+                sql = 'UPDATE task SET name = ?, description = ? WHERE id = ?';
+                db.run(sql, [name, description, id], (err) => {
+                    if (err) {
+                        next(err);
+                        return;
+                    }
+                    res.json({ result: true });
+                });
+                return;
+            }
+            res.status(404).json({ result: false });
+        });
+        return;
+    }
+    res.status(400).json({ result: false });
 });
 
 app.delete('/todo/:id', (req, res, next) => {
     const { id } = req.params;
-    sql = 'DELETE FROM task WHERE id = ?';
-    db.run(sql, [id], (err) => {
+    let sql = `SELECT * FROM task WHERE id = ?;`;
+    db.get(sql, id, (err, row) => {
         if (err) {
             next(err);
             return;
         }
-        res.json({ result: true });
+        if (row) {
+            sql = 'DELETE FROM task WHERE id = ?';
+            db.run(sql, [id], (err) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+                res.json({ result: true });
+            });
+            return;
+        }
+        res.status(404).json({ result: false });
     });
 });
 
