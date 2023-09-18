@@ -8,9 +8,6 @@ const app = express();
 const db = new sqlite3.Database('db.sqlite');
 const port = 3000;
 
-// Disable X-Powered-By response header banner
-app.disable('x-powered-by');
-
 // Compression, security, logger and json parser middleware
 app.use(compression());
 app.use(helmet());
