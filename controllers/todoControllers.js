@@ -1,22 +1,11 @@
-const compression = require('compression');
 const express = require('express');
-const helmet = require('helmet');
-const logger = require('morgan');
-const sqlite3 = require('sqlite3');
+const db = require('../db/db');
 
-const app = express();
-const db = new sqlite3.Database('db.sqlite');
-const port = 3000;
-
-// Compression, security, logger and json parser middleware
-app.use(compression());
-app.use(helmet());
-app.use(logger(':date :remote-addr ":method :url" :status'));
-app.use(express.json());
+const router = express.Router();
 
 // GET /todo
 // It returns all the tasks
-app.get('/todo', (req, res, next) => {
+router.get('/', (req, res, next) => {
     const sql = 'SELECT * FROM task;';
     db.all(sql, (err, rows) => {
         if (err) {
@@ -35,7 +24,7 @@ app.get('/todo', (req, res, next) => {
 
 // GET /todo/id
 // It returns a task
-app.get('/todo/:id', (req, res, next) => {
+router.get('/:id', (req, res, next) => {
     const { id } = req.params;
     const sql = `SELECT * FROM task WHERE id = ?;`;
     db.get(sql, id, (err, row) => {
@@ -59,7 +48,7 @@ app.get('/todo/:id', (req, res, next) => {
 //     name:  "name",
 //     description: "description"
 // }
-app.post('/todo', (req, res, next) => {
+router.post('/', (req, res, next) => {
     const { name, description } = req.body;
     if (name && description) {
         const sql = 'INSERT INTO task (name, description) VALUES(?, ?);';
@@ -82,7 +71,7 @@ app.post('/todo', (req, res, next) => {
 //     name:  "name",
 //     description: "description"
 // }
-app.put('/todo/:id', (req, res, next) => {
+router.put('/:id', (req, res, next) => {
     const { id } = req.params;
     const { name, description } = req.body;
     if (name && description) {
@@ -114,7 +103,7 @@ app.put('/todo/:id', (req, res, next) => {
 
 // DELETE /todo/id
 // It deletes a task
-app.delete('/todo/:id', (req, res, next) => {
+router.delete('/:id', (req, res, next) => {
     const { id } = req.params;
     let sql = `SELECT * FROM task WHERE id = ?;`;
     db.get(sql, id, (err, row) => {
@@ -138,17 +127,4 @@ app.delete('/todo/:id', (req, res, next) => {
     });
 });
 
-// 500 and 404 errors handler
-app.use((err, req, res, next) => {
-    console.error(err.message);
-    res.status(500);
-    res.json({ result: false });
-});
-app.use((req, res) => {
-    res.status(404);
-    res.json({ result: false });
-});
-
-app.listen(port, () => {
-    console.log(`Server listening on http://localhost:${port}/`);
-});
+module.exports = router;

@@ -1,10 +1,9 @@
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('db.sqlite');
+const db = require('../db/db');
 
 const sql =
     'CREATE TABLE task (id INTEGER PRIMARY KEY, name TEXT, description TEXT);';
 
-// Initialize the database
+// Initialize database
 db.run(sql, (err) => {
     if (err) {
         console.error('Error during database initialization:');
